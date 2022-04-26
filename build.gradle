@@ -1,10 +1,17 @@
 plugins {
     id 'java-library'
     id "io.freefair.lombok" version "6.3.0"
+    id 'signing'
+    id 'maven-publish'
 }
 
-group 'com.github.zhongzichang'
+group 'io.github.zhongzichang'
 version '1.0-SNAPSHOT'
+
+compileJava   {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public' }
@@ -15,6 +22,7 @@ repositories {
     maven { url "https://repo.spring.io/snapshot" }
     maven { url "https://repo.spring.io/milestone" }
     mavenCentral()
+
 }
 
 dependencies {
@@ -28,4 +36,49 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+
+    publications {
+        springIap(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+
+        maven {
+            name = 'build'
+            url = layout.buildDirectory.dir("repo")
+        }
+
+        maven {
+            name "snapshot"
+            url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            credentials {
+                username sonatypeUsername
+                password sonatypePassword
+            }
+        }
+
+        maven {
+            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username sonatypeUsername
+                password sonatypePassword
+            }
+        }
+    }
+
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.springIap
 }
