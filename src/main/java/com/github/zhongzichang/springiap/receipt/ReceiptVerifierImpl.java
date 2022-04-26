@@ -5,25 +5,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.github.zhongzichang.springiap.ReceiptVerifier;
-import io.netty.channel.ChannelOption;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
-import org.slf4j.Logger;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
+import org.apache.logging.log4j.Logger;
 
-import java.time.Duration;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Base64;
-import java.util.concurrent.TimeUnit;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 public class ReceiptVerifierImpl implements ReceiptVerifier {
 
@@ -39,72 +29,53 @@ public class ReceiptVerifierImpl implements ReceiptVerifier {
     objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
   }
 
-  private final WebClient.RequestBodySpec bodySpec4Sandbox;
-  private final WebClient.RequestBodySpec bodySpec;
-
-  public ReceiptVerifierImpl() {
-    HttpClient httpClient =
-        HttpClient.create()
-            .wiretap(true)
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .responseTimeout(Duration.ofMillis(5000))
-            .doOnConnected(
-                conn ->
-                    conn.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS))
-                        .addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS)));
-
-    WebClient webClient =
-        WebClient.builder()
-            .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .codecs(
-                clientDefaultCodecsConfigurer -> {
-                  clientDefaultCodecsConfigurer
-                      .defaultCodecs()
-                      .jackson2JsonEncoder(
-                          new Jackson2JsonEncoder(objectMapper, MediaType.APPLICATION_JSON));
-                  clientDefaultCodecsConfigurer
-                      .defaultCodecs()
-                      .jackson2JsonDecoder(
-                          new Jackson2JsonDecoder(objectMapper, MediaType.APPLICATION_JSON));
-                })
-            .filter(logRequest())
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-            .build();
-
-    this.bodySpec4Sandbox = webClient.post().uri(URL_SANDBOX);
-    this.bodySpec = webClient.post().uri(URL_VERIFY);
-  }
-
-  private static ExchangeFilterFunction logRequest() {
-    return ExchangeFilterFunction.ofRequestProcessor(
-        clientRequest -> {
-          LOGGER.debug("Request: {} {}", clientRequest.method(), clientRequest.url());
-          clientRequest
-              .headers()
-              .forEach(
-                  (name, values) -> values.forEach(value -> LOGGER.debug("{}={}", name, value)));
-          return Mono.just(clientRequest);
-        });
-  }
-
   @Override
-  public ReceiptVerifyResult verify(String receiptData, String password, boolean sandbox) {
+  public ReceiptVerifyResult verify(String receiptData, String password, boolean sandbox) throws IOException {
     byte[] bytes = Base64.getUrlDecoder().decode(receiptData);
     return verify(bytes, password, sandbox);
   }
 
   @Override
-  public ReceiptVerifyResult verify(byte[] receiptData, String password, boolean sandbox) {
-    WebClient.RequestBodySpec funBodySpec = sandbox ? bodySpec4Sandbox : bodySpec;
+  public ReceiptVerifyResult verify(byte[] receiptData, String password, boolean sandbox) throws IOException {
     ReceiptVerifyRequest verifyRequest = new ReceiptVerifyRequest();
     verifyRequest.setExcludeOldTransactions(true);
     verifyRequest.setReceiptData(receiptData);
     if (password != null && !password.isEmpty()) verifyRequest.setPassword(password);
-    return funBodySpec
-        .body(Mono.just(verifyRequest), ReceiptVerifyRequest.class)
-        .retrieve()
-        .bodyToMono(ReceiptVerifyResult.class)
-        .block();
+    String url = sandbox ? URL_SANDBOX : URL_VERIFY;
+    String responseBody = httpPost(url, objectMapper.writeValueAsString(verifyRequest));
+    return objectMapper.readValue(responseBody, ReceiptVerifyResult.class);
+  }
+
+  private String httpPost(String url, String requestBody) throws IOException {
+
+    LOGGER.info("url: {}, requestBody: {}", url, requestBody);
+    URL u = new URL(url);
+    HttpURLConnection con = (HttpURLConnection) u.openConnection();
+
+    con.setRequestMethod("POST");
+    con.setRequestProperty("Content-Type", "application/json");
+    con.setRequestProperty("Accept", "application/json");
+
+    HttpURLConnection.setFollowRedirects(true);
+    con.setInstanceFollowRedirects(false);
+    con.setDoOutput(true);
+
+    OutputStream out = con.getOutputStream();
+    out.write(requestBody.getBytes());
+
+    InputStream inputStream = con.getInputStream();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+    StringBuilder response = new StringBuilder();
+    String responseSingle = null;
+
+    while ((responseSingle = reader.readLine()) != null) {
+      response.append(responseSingle);
+    }
+
+    String responseBody = response.toString();
+    LOGGER.info("responseBody: {}", responseBody);
+
+    return responseBody;
   }
 }

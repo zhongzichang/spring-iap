@@ -4,13 +4,15 @@ import com.github.zhongzichang.springiap.receipt.ReceiptVerifierImpl;
 import com.github.zhongzichang.springiap.receipt.ReceiptVerifyResult;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ReceiptVerifierTest {
 
   @Test
-  void verifyDeprecatedTransactionTest() {
+  void verifyDeprecatedTransactionTest() throws IOException {
 
     // deprecated transaction (single transaction)
     String content =

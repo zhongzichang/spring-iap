@@ -1,6 +1,9 @@
 package com.github.zhongzichang.springiap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.zhongzichang.springiap.receipt.ReceiptVerifyResult;
+
+import java.io.IOException;
 
 /**
  * App Store In-App Purchase Receipt Verifier.
@@ -18,7 +21,7 @@ public interface ReceiptVerifier {
    * @param sandbox true if in sandbox else false.
    * @return Result mapped to Decoded responseBody.
    */
-  ReceiptVerifyResult verify(String receiptData, String password, boolean sandbox);
+  ReceiptVerifyResult verify(String receiptData, String password, boolean sandbox) throws IOException;
 
   /**
    * Send a receipt to the App Store for verification.
@@ -29,5 +32,5 @@ public interface ReceiptVerifier {
    * @param sandbox true if in sandbox else false.
    * @return Result mapped to Decoded responseBody.
    */
-  ReceiptVerifyResult verify(byte[] receiptData, String password, boolean sandbox);
+  ReceiptVerifyResult verify(byte[] receiptData, String password, boolean sandbox) throws IOException;
 }
