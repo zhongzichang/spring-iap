@@ -48,7 +48,36 @@ publishing {
 
     publications {
         springIap(MavenPublication) {
+
             from components.java
+
+            pom {
+
+                name = 'spring-iap'
+                description = 'SDK for validating in-app transaction receipts and handling notifications from app store server.'
+                url = 'https://github.com/zhongzichang/spring-iap'
+
+                licenses {
+                    license {
+                        name = 'GNU Lesser General Public License, version 2.1'
+                        url = 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'zczhong'
+                        name = 'Zhong ZiChang'
+                        email = 'zhongzichang@gmail.com'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:https@github.com:zhongzichang/spring-iap.git'
+                    developerConnection = 'scm:git:git@github.com:zhongzichang/spring-iap.git'
+                    url = 'https://github.com/zhongzichang/spring-iap'
+                }
+            }
         }
     }
 
