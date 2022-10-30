@@ -24,7 +24,7 @@ implementation('io.github.zhongzichang:spring-iap:1.0')
 Send a receipt to the App Store for verification.
 
 ```java
-ReceiptVerifier verifier = new ReceiptVerfierImpl();
+ReceiptVerifier verifier = new ReceiptVerifierImpl();
 ReceiptVerifyResult result = verifier.verify(receiptData, sharedSecret, false);
 ```
 
