@@ -49,32 +49,63 @@ public class ReceiptVerifierImpl implements ReceiptVerifier {
   private String httpPost(String url, String requestBody) throws IOException {
 
     LOGGER.info("url: {}, requestBody: {}", url, requestBody);
-    URL u = new URL(url);
-    HttpURLConnection con = (HttpURLConnection) u.openConnection();
 
-    con.setRequestMethod("POST");
-    con.setRequestProperty("Content-Type", "application/json");
-    con.setRequestProperty("Accept", "application/json");
+    URL u = null;
+    HttpURLConnection con = null;
+    OutputStream output = null;
+    InputStream input = null;
+    BufferedReader reader = null;
+    String responseBody = null;
 
-    HttpURLConnection.setFollowRedirects(true);
-    con.setInstanceFollowRedirects(false);
-    con.setDoOutput(true);
+    try {
 
-    OutputStream out = con.getOutputStream();
-    out.write(requestBody.getBytes());
+      u = new URL(url);
+      con = (HttpURLConnection) u.openConnection();
 
-    InputStream inputStream = con.getInputStream();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+      con.setRequestMethod("POST");
+      con.setRequestProperty("Content-Type", "application/json");
+      con.setRequestProperty("Accept", "application/json");
 
-    StringBuilder response = new StringBuilder();
-    String responseSingle = null;
+      HttpURLConnection.setFollowRedirects(true);
+      con.setInstanceFollowRedirects(false);
+      con.setDoOutput(true);
 
-    while ((responseSingle = reader.readLine()) != null) {
-      response.append(responseSingle);
+      output = con.getOutputStream();
+      output.write(requestBody.getBytes());
+
+      input = con.getInputStream();
+      reader = new BufferedReader(new InputStreamReader(input));
+
+      StringBuilder response = new StringBuilder();
+      String responseSingle = null;
+
+      while ((responseSingle = reader.readLine()) != null) {
+        response.append(responseSingle);
+      }
+
+      responseBody = response.toString();
+
+      LOGGER.info("responseBody: {}", responseBody);
+
+    } finally{
+
+      if(reader != null){
+        reader.close();
+      }
+
+      if(input != null){
+        input.close();
+      }
+
+      if(output != null){
+        output.close();
+      }
+
+      if(con != null){
+        con.disconnect();
+      }
+
     }
-
-    String responseBody = response.toString();
-    LOGGER.info("responseBody: {}", responseBody);
 
     return responseBody;
   }
