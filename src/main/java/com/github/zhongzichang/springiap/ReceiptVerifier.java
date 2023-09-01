@@ -1,6 +1,5 @@
 package com.github.zhongzichang.springiap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.zhongzichang.springiap.receipt.ReceiptVerifyResult;
 
 import java.io.IOException;

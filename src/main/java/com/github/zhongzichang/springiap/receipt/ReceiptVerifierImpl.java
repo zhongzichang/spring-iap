@@ -13,13 +13,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-
 public class ReceiptVerifierImpl implements ReceiptVerifier {
 
   private static final String URL_SANDBOX = "https://sandbox.itunes.apple.com/verifyReceipt";
   private static final String URL_VERIFY = "https://buy.itunes.apple.com/verifyReceipt";
-  private static final Logger LOGGER = getLogger(ReceiptVerifierImpl.class);
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -48,14 +45,12 @@ public class ReceiptVerifierImpl implements ReceiptVerifier {
 
   private String httpPost(String url, String requestBody) throws IOException {
 
-    LOGGER.info("url: {}, requestBody: {}", url, requestBody);
-
-    URL u = null;
+    URL u;
     HttpURLConnection con = null;
     OutputStream output = null;
     InputStream input = null;
     BufferedReader reader = null;
-    String responseBody = null;
+    String responseBody;
 
     try {
 
@@ -77,15 +72,13 @@ public class ReceiptVerifierImpl implements ReceiptVerifier {
       reader = new BufferedReader(new InputStreamReader(input));
 
       StringBuilder response = new StringBuilder();
-      String responseSingle = null;
+      String responseSingle;
 
       while ((responseSingle = reader.readLine()) != null) {
         response.append(responseSingle);
       }
 
       responseBody = response.toString();
-
-      LOGGER.info("responseBody: {}", responseBody);
 
     } finally{
 

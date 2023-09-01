@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'io.github.zhongzichang'
-version '1.0-SNAPSHOT'
+version '1.0.1-SNAPSHOT'
 
 compileJava   {
     sourceCompatibility = '1.8'
@@ -29,7 +29,6 @@ dependencies {
 
     implementation 'com.auth0:java-jwt:4.2.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
-    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
