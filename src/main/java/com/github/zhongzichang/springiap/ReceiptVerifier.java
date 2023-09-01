@@ -19,6 +19,7 @@ public interface ReceiptVerifier {
    * @param password Your app’s shared secret, which is a hexadecimal string.
    * @param sandbox true if in sandbox else false.
    * @return Result mapped to Decoded responseBody.
+   * @throws IOException Unable to connect to itunes
    */
   ReceiptVerifyResult verify(String receiptData, String password, boolean sandbox) throws IOException;
 
@@ -30,6 +31,7 @@ public interface ReceiptVerifier {
    * @param password Your app’s shared secret, which is a hexadecimal string.
    * @param sandbox true if in sandbox else false.
    * @return Result mapped to Decoded responseBody.
+   * @throws IOException Unable to connect to itunes
    */
   ReceiptVerifyResult verify(byte[] receiptData, String password, boolean sandbox) throws IOException;
 }
