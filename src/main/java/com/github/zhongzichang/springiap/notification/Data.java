@@ -12,4 +12,5 @@ public class Data {
   private String signedRenewalInfo;
 
   private String signedTransactionInfo;
+  private String status;
 }
