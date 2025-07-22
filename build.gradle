@@ -91,16 +91,16 @@ publishing {
             name "snapshot"
             url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             credentials {
-                username sonatypeUsername
-                password sonatypePassword
+                username ${{ secrets.MVN_USER_NAME }}
+                password ${{ secrets.MVN_PASSWORD }}
             }
         }
 
         maven {
             url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials {
-                username sonatypeUsername
-                password sonatypePassword
+                username ${{ secrets.MVN_USER_NAME }}
+                password ${{ secrets.MVN_PASSWORD }}
             }
         }
     }
