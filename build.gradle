@@ -1,8 +1,7 @@
 plugins {
     id 'java-library'
     id "io.freefair.lombok" version "6.3.0"
-    id 'signing'
-    id 'maven-publish'
+    id 'org.jreleaser' version '1.19.0'
 }
 
 group 'io.github.zhongzichang'
@@ -83,31 +82,27 @@ publishing {
     repositories {
 
         maven {
-            name = 'build'
-            url = layout.buildDirectory.dir("repo")
+            url = layout.buildDirectory.dir("staging-deploy")
         }
 
-        maven {
-            name "snapshot"
-            url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            credentials {
-                username ${{ secrets.MVN_USER_NAME }}
-                password ${{ secrets.MVN_PASSWORD }}
-            }
-        }
-
-        maven {
-            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username ${{ secrets.MVN_USER_NAME }}
-                password ${{ secrets.MVN_PASSWORD }}
-            }
-        }
     }
 
 }
 
-signing {
-    useGpgCmd()
-    sign publishing.publications.springIap
+jreleaser {
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+        }
+    }
 }
