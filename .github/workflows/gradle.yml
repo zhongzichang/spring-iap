@@ -40,6 +40,7 @@ jobs:
     - name: Restore ~/.jreleaser/config.toml
       env:
         JRELEASER_CONFIG_TOML: ${{ secrets.JRELEASER_CONFIG_TOML }}
+        JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         mkdir -p ~/.jreleaser/
