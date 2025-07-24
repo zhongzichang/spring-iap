@@ -23,29 +23,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up JDK 11
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '11'
         distribution: 'temurin'
-    - name: Restore gradle.properties
-      env:
-        GRADLE_PROPERTIES: ${{ secrets.GRADLE_PROPERTIES }}
-      shell: bash
-      run: |
-        mkdir -p ~/.gradle/
-        echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV
-        echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
-    - name: Restore ~/.jreleaser/config.toml
-      env:
-        JRELEASER_CONFIG_TOML: ${{ secrets.JRELEASER_CONFIG_TOML }}
-      shell: bash
-      run: |
-        mkdir -p ~/.jreleaser/
-        echo "JRELEASER_USER_HOME=${HOME}/.jreleaser" >> $GITHUB_ENV
-        echo "${JRELEASER_CONFIG_TOML}" > ~/.jreleaser/config.toml
-    - name: Build
-      env:
-        JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: ./gradlew jreleaserConfig && ./gradlew clean && ./gradlew publish
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+    - name: Build with Gradle
+      run: ./gradlew build
