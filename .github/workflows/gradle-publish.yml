@@ -5,7 +5,7 @@
 # This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
 
-name: Gradle Publishing
+name: Gradle Publishing to Maven Central Repository
 
 on:
   push:
@@ -31,7 +31,17 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
-
+      
+    - name: Restore ~/.jreleaser/config.toml
+      env:
+        JRELEASER_CONFIG_TOML: ${{ secrets.JRELEASER_CONFIG_TOML }}
+      shell: bash
+      run: |
+        mkdir -p ~/.jreleaser/
+        echo "${JRELEASER_CONFIG_TOML}" > ~/.jreleaser/config.toml
+        
     - name: Build with Gradle
-      run: ./gradlew build
+      env:
+        JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: ./gradlew jreleaserConfig publish jreleaserDeploy
 
