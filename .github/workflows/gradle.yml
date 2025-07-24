@@ -45,6 +45,6 @@ jobs:
         mkdir -p ~/.jreleaser/
         echo "JRELEASER_USER_HOME=${HOME}/.jreleaser" >> $GITHUB_ENV
         echo "${JRELEASER_CONFIG_TOML}" > ~/.jreleaser/config.toml
-        echo "\JRELEASER_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> ~/.jreleaser/config.toml
+        echo "\nJRELEASER_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> ~/.jreleaser/config.toml
     - name: Build
       run: ./gradlew jreleaserConfig && ./gradlew clean && ./gradlew publish
