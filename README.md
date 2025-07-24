@@ -9,14 +9,14 @@ Maven
 <dependency>
   <groupId>io.github.zhongzichang</groupId>
   <artifactId>spring-iap</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 ```
 
 Gradle
 
 ```groovy
-implementation('io.github.zhongzichang:spring-iap:1.0.1')
+implementation('io.github.zhongzichang:spring-iap:1.0.2')
 ```
 
 ## Usage
