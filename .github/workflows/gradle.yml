@@ -36,7 +36,15 @@ jobs:
         mkdir -p ~/.gradle/
         echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV
         echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-      with:
-        arguments: build
+    - name: Restore ~/.jreleaser/config.toml
+      env:
+        JRELEASER_CONFIG_TOML: ${{ secrets.JRELEASER_CONFIG_TOML }}
+      shell: bash
+      run: |
+        mkdir -p ~/.jreleaser/
+        echo "JRELEASER_USER_HOME=${HOME}/.jreleaser" >> $GITHUB_ENV
+        echo "${JRELEASER_CONFIG_TOML}" > ~/.jreleaser/config.toml
+    - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+    - name: Build
+        run: ./gradlew build
