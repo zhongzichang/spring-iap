@@ -1,5 +1,8 @@
 # spring-iap
-SDK for validating in-app transaction receipts and handling notifications from app store server.
+
+[![Java CI with Gradle](https://github.com/zhongzichang/spring-iap/actions/workflows/gradle.yml/badge.svg?branch=main&event=push)](https://github.com/zhongzichang/spring-iap/actions/workflows/gradle.yml)
+
+Validating in-app transaction receipts and handling notifications from app store server.
 
 ## Installation
 
