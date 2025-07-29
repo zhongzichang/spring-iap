@@ -34,33 +34,28 @@ public class NotificationDecoderImpl implements NotificationDecoder {
     Algorithm.ECDSA256((ECPublicKey) publicKey, null).verify(jwt);
   }
 
+  private String decode(String jwtString, Class clz) throws JsonProcessingException, CertificateException {
+    DecodedJWT jwt = JWT.decode(jwtString);
+    verify(jwt);
+    String payload = new String(Base64.getDecoder().decode(jwt.getPayload()));
+    return objectMapper.readValue(payload, clz);
+  }
+
   @Override
   public ResponseBodyV2DecodedPayload decodePayload(String signedPayload)
       throws JsonProcessingException, CertificateException {
-
-    DecodedJWT jwt = JWT.decode(signedPayload);
-    verify(jwt);
-    String payload = new String(Base64.getDecoder().decode(jwt.getPayload()));
-    return objectMapper.readValue(payload, ResponseBodyV2DecodedPayload.class);
+    return decode(signedPayload, ResponseBodyV2DecodedPayload.class);
   }
 
   @Override
   public JWSRenewalInfoDecodedPayload decodeRenewalInfo(String signedRenewalInfo)
       throws JsonProcessingException, CertificateException {
-
-    DecodedJWT jwt = JWT.decode(signedRenewalInfo);
-    verify(jwt);
-    String payload = new String(Base64.getDecoder().decode(jwt.getPayload()));
-    return objectMapper.readValue(payload, JWSRenewalInfoDecodedPayload.class);
+    return decode(signedPayload, JWSRenewalInfoDecodedPayload.class);
   }
 
   @Override
   public JWSTransactionDecodedPayload decodeTransaction(String signedTransaction)
       throws JsonProcessingException, CertificateException {
-
-    DecodedJWT jwt = JWT.decode(signedTransaction);
-    verify(jwt);
-    String payload = new String(Base64.getDecoder().decode(jwt.getPayload()));
-    return objectMapper.readValue(payload, JWSTransactionDecodedPayload.class);
+    return decode(signedPayload, JWSTransactionDecodedPayload.class);
   }
 }
